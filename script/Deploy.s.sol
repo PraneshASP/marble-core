@@ -1,13 +1,30 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.25 <0.9.0;
+// // SPDX-License-Identifier: UNLICENSED
+// pragma solidity ^0.8.13;
 
-import { Foo } from "../src/Foo.sol";
+// import "forge-std/Script.sol";
+// import "../src/CreatorNFT.sol";
+// import "../src/POUFPaymentModel.sol";
 
-import { BaseScript } from "./Base.s.sol";
+// contract DeployScript is Script {
+//     function setUp() public {}
 
-/// @dev See the Solidity Scripting tutorial: https://book.getfoundry.sh/tutorials/solidity-scripting
-contract Deploy is BaseScript {
-    function run() public broadcast returns (Foo foo) {
-        foo = new Foo();
-    }
-}
+//     function run() public {
+//         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+//         vm.startBroadcast(deployerPrivateKey);
+
+//          CreatorNFT creatorNFT = new CreatorNFT();
+
+//          uint256 tokenId = creatorNFT.mintCreatorToken("");
+
+//          uint256 subscriptionPrice = 0.1 ether;  
+//         POUFPaymentModel paymentModel = new POUFPaymentModel(address(creatorNFT), tokenId, subscriptionPrice);
+
+//          creatorNFT.addPaymentModel(tokenId, address(paymentModel));
+
+//         vm.stopBroadcast();
+
+//         console.log("CreatorNFT deployed at:", address(creatorNFT));
+//         console.log("PaymentModel deployed at:", address(paymentModel));
+//         console.log("Creator Token ID:", tokenId);
+//     }
+// }
