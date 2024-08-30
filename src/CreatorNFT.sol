@@ -15,12 +15,10 @@ contract CreatorNFT is ERC721, Ownable {
     // Mapping from token ID to array of payment model addresses
     mapping(uint256 => address[]) private _paymentModels;
 
-    IPOUFPaymentModel immutable poufPaymentModelImpl;  // TODO: revisit appraoch to make it permissioless
+    IPOUFPaymentModel immutable poufPaymentModelImpl; // TODO: revisit appraoch to make it permissioless
     IERC6551Registry immutable registry;
-    constructor(
-        address _poufPaymentModelImpl,
-        address _registry
-    ) ERC721("CreatorNFT", "CNFT") Ownable(msg.sender){
+
+    constructor(address _poufPaymentModelImpl, address _registry) ERC721("CreatorNFT", "CNFT") Ownable(msg.sender) {
         poufPaymentModelImpl = IPOUFPaymentModel(_poufPaymentModelImpl);
         registry = IERC6551Registry(_registry);
     }
@@ -33,12 +31,18 @@ contract CreatorNFT is ERC721, Ownable {
     }
 
     function deployPOUFPaymentModel(uint256 tokenId, uint256 subscriptionPrice) public {
-        if(ownerOf(tokenId) != msg.sender) revert OnlyOwner();
+        if (ownerOf(tokenId) != msg.sender) revert OnlyOwner();
         uint256 chainId;
         assembly {
             chainId := chainid()
         }
-        address paymentModel = registry.createAccount(address(poufPaymentModelImpl), keccak256(abi.encode(msg.sender,tokenId,subscriptionPrice)), chainId, address(this), tokenId);
+        address paymentModel = registry.createAccount(
+            address(poufPaymentModelImpl),
+            keccak256(abi.encode(msg.sender, tokenId, subscriptionPrice)),
+            chainId,
+            address(this),
+            tokenId
+        );
         _paymentModels[tokenId].push(paymentModel);
     }
 

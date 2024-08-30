@@ -16,7 +16,7 @@
 
 //          uint256 tokenId = creatorNFT.mintCreatorToken("");
 
-//          uint256 subscriptionPrice = 0.1 ether;  
+//          uint256 subscriptionPrice = 0.1 ether;
 //         POUFPaymentModel paymentModel = new POUFPaymentModel(address(creatorNFT), tokenId, subscriptionPrice);
 
 //          creatorNFT.addPaymentModel(tokenId, address(paymentModel));

@@ -34,5 +34,7 @@ interface IERC6551Registry {
         uint256 chainId,
         address tokenContract,
         uint256 tokenId
-    ) external returns (address account);
+    )
+        external
+        returns (address account);
 }
