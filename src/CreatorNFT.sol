@@ -43,6 +43,7 @@ contract CreatorNFT is ERC721, Ownable {
             address(this),
             tokenId
         );
+        IPOUFPaymentModel(paymentModel).initialize(address(this), tokenId, subscriptionPrice);
         _paymentModels[tokenId].push(paymentModel);
     }
 

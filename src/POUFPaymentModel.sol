@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import { IERC6551Account } from "src/interfaces/IERC6551.sol";
 
 /// @notice Pay once, use forever payment model.
+/// TODO: This contract should be inherting LZ OAPP interface and subscribe logic should call LZ Endpoint to enable cross-chain subscriptions
+/// TODO: Look into integrating SIGN PROTOCOL to attest subscriptions rather than paying for gas (GASLESS SUBSCRIPTION) ?????
 contract POUFPaymentModel is IERC165, IERC1271, IERC6551Account {
     address public creatorNFT;
     uint256 public tokenId;
