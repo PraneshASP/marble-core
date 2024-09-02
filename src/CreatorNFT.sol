@@ -52,10 +52,11 @@ contract CreatorNFT is ERC721, Ownable {
         uint256 newTokenId = _tokenIds++;
         _safeMint(msg.sender, newTokenId);
         tokenUris[newTokenId] = _tokenUri;
+        _deployPaymentModel(newTokenId);
         return newTokenId;
     }
 
-    function deployPaymentModel(uint256 tokenId) public {
+    function _deployPaymentModel(uint256 tokenId) internal {
         if (ownerOf(tokenId) != msg.sender) revert OnlyOwner();
         uint256 chainId;
         assembly {

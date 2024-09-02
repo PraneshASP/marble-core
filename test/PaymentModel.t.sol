@@ -38,7 +38,7 @@ contract PaymentModelTest is Test {
         uint256 tokenId = creatorNFT.mint("ipfs://example");
         assertEq(creatorNFT.ownerOf(tokenId), creator);
 
-        creatorNFT.deployPaymentModel(tokenId);
+        //creatorNFT.deployPaymentModel(tokenId);
 
         address[] memory paymentModels = creatorNFT.getPaymentModels(tokenId);
         assertEq(paymentModels.length, 1);
