@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
-import { IERC6551Account } from "./interfaces/IERC6551.sol";
+import {IERC6551Account} from "./interfaces/IERC6551.sol";
 
 contract PaymentModel is IERC165, IERC1271, IERC6551Account {
     address public creatorNFT;
@@ -43,8 +43,8 @@ contract PaymentModel is IERC165, IERC1271, IERC6551Account {
     event TierUpdated(uint256 tierId, uint256 price, uint256 duration, bool isActive);
 
     function createTier(uint256 _price, uint256 _duration) external {
-       // if (msg.sender != IERC721(creatorNFT).ownerOf(tokenId)) revert InvalidCaller();
-       // TODO: Add check via _lzReceive
+        // if (msg.sender != IERC721(creatorNFT).ownerOf(tokenId)) revert InvalidCaller();
+        // TODO: Add check via _lzReceive
         tierCount++;
         subscriptionTiers[tierCount] = SubscriptionTier(_price, _duration, true);
 
@@ -90,10 +90,10 @@ contract PaymentModel is IERC165, IERC1271, IERC6551Account {
     }
 
     function withdraw() external {
-      //  if (msg.sender != IERC721(creatorNFT).ownerOf(tokenId)) revert InvalidCaller();
-      // TODO: Add check via _lzReceive
+        //  if (msg.sender != IERC721(creatorNFT).ownerOf(tokenId)) revert InvalidCaller();
+        // TODO: Add check via _lzReceive
 
-        (bool sent,) = address(msg.sender).call{ value: address(this).balance }("");
+        (bool sent,) = address(msg.sender).call{value: address(this).balance}("");
         if (!sent) revert CannotTransferFunds();
     }
 
@@ -117,7 +117,7 @@ contract PaymentModel is IERC165, IERC1271, IERC6551Account {
     function token(address account) internal view returns (uint256, address, uint256) {
         bytes memory encodedData = new bytes(0x60);
 
-    assembly {
+        assembly {
             // copy 0x60 bytes from end of context
             extcodecopy(account, add(encodedData, 0x20), 0x4d, 0x60)
         }
@@ -136,7 +136,7 @@ contract PaymentModel is IERC165, IERC1271, IERC6551Account {
         return bytes4(0);
     }
 
-    receive() external payable override { }
+    receive() external payable override {}
 
-    function state() external view override returns (uint256) { }
+    function state() external view override returns (uint256) {}
 }

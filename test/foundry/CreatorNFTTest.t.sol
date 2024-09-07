@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.22;
 
-import { CreatorNFT } from "../../contracts/CreatorNFT.sol";
-import { CustomRegistry } from "../../contracts/CustomRegistry.sol";
-import { IOAppOptionsType3, EnforcedOptionParam } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
-import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import {CreatorNFT} from "../../contracts/CreatorNFT.sol";
+import {CustomRegistry} from "../../contracts/CustomRegistry.sol";
+import {
+    IOAppOptionsType3, EnforcedOptionParam
+} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
+import {OptionsBuilder} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "forge-std/console.sol";
-import { TestHelperOz5 } from "@layerzerolabs/test-devtools-evm-foundry/contracts/TestHelperOz5.sol";
-import { IERC6551Registry } from "../../contracts/interfaces/IERC6551Registry.sol";
-import { AddressCast } from "@layerzerolabs/lz-evm-protocol-v2/contracts/libs/AddressCast.sol";
-import { Origin } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
-import { PaymentModel } from "contracts/PaymentModel.sol";
+import {TestHelperOz5} from "@layerzerolabs/test-devtools-evm-foundry/contracts/TestHelperOz5.sol";
+import {IERC6551Registry} from "../../contracts/interfaces/IERC6551Registry.sol";
+import {AddressCast} from "@layerzerolabs/lz-evm-protocol-v2/contracts/libs/AddressCast.sol";
+import {Origin} from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
+import {PaymentModel} from "contracts/PaymentModel.sol";
 
 contract CreatorNFTTest is TestHelperOz5 {
     using OptionsBuilder for bytes;
@@ -65,7 +67,7 @@ contract CreatorNFTTest is TestHelperOz5 {
         uint256 tokenId = aCreatorNFT.mint("ipfs://test");
 
         // Get deployment fees
-        (uint256 nativeFee, ) = aCreatorNFT.getDeploymentFees(tokenId, bEid, paymentModuleImpl);
+        (uint256 nativeFee,) = aCreatorNFT.getDeploymentFees(tokenId, bEid, paymentModuleImpl);
 
         // Deploy payment module cross-chain
         vm.prank(userA);
@@ -83,7 +85,7 @@ contract CreatorNFTTest is TestHelperOz5 {
         );
 
         // Create the Origin struct
-         Origin memory origin = Origin({
+        Origin memory origin = Origin({
             srcEid: aEid,
             sender: AddressCast.toBytes32(address(aRegistry)),
             nonce: 1 // You might want to use an actual nonce here
@@ -98,26 +100,22 @@ contract CreatorNFTTest is TestHelperOz5 {
             "" // _extraData
         );
 
-
-        // Verify the payment module was deployed on chain B
-        bytes32 salt = keccak256(abi.encode(address(aCreatorNFT), tokenId, bEid));
-      
-
         address expectedPaymentModule = bRegistry.getPaymentModule(bEid, tokenId, address(aCreatorNFT));
         assertTrue(expectedPaymentModule != address(0), "Payment module should be deployed on chain B");
 
         // Verify the payment module details
-        (uint256 chainId, address tokenContract, uint256 deployedTokenId) = PaymentModel(payable(expectedPaymentModule)).token();
+        (uint256 chainId, address tokenContract, uint256 deployedTokenId) =
+            PaymentModel(payable(expectedPaymentModule)).token();
         assertEq(chainId, bEid, "Incorrect chain ID");
         assertEq(tokenContract, address(aCreatorNFT), "Incorrect token contract address");
         assertEq(deployedTokenId, tokenId, "Incorrect token ID");
     }
 
-       function test_createTier() public {
+    function test_createTier() public {
         // Mint an NFT and deploy payment module
         vm.prank(userA);
         uint256 tokenId = aCreatorNFT.mint("ipfs://test");
-        (uint256 nativeFee, ) = aCreatorNFT.getDeploymentFees(tokenId, bEid, paymentModuleImpl);
+        (uint256 nativeFee,) = aCreatorNFT.getDeploymentFees(tokenId, bEid, paymentModuleImpl);
         vm.prank(userA);
         aCreatorNFT.deployPaymentModule{value: nativeFee}(tokenId, bEid, paymentModuleImpl);
 
@@ -129,11 +127,7 @@ contract CreatorNFTTest is TestHelperOz5 {
             address(aCreatorNFT),
             tokenId
         );
-        Origin memory origin = Origin({
-            srcEid: aEid,
-            sender: AddressCast.toBytes32(address(aRegistry)),
-            nonce: 1
-        });
+        Origin memory origin = Origin({srcEid: aEid, sender: AddressCast.toBytes32(address(aRegistry)), nonce: 1});
         vm.prank(address(endpoints[bEid]));
         bRegistry.lzReceive(origin, bytes32(0), payload, address(0), "");
 
@@ -147,17 +141,17 @@ contract CreatorNFTTest is TestHelperOz5 {
         PaymentModel(payable(paymentModule)).createTier(price, duration);
 
         // Verify tier creation
-        (uint256 tierPrice, uint256 tierDuration, bool isActive) = PaymentModel(payable(paymentModule)).subscriptionTiers(1);
+        (uint256 tierPrice, uint256 tierDuration, bool isActive) =
+            PaymentModel(payable(paymentModule)).subscriptionTiers(1);
         assertEq(tierPrice, price, "Incorrect tier price");
         assertEq(tierDuration, duration, "Incorrect tier duration");
         assertTrue(isActive, "Tier should be active");
     }
 
     function test_subscribe() public {
-        // Set up NFT, payment module, and tier (reusing code from test_createTier)
         vm.prank(userA);
         uint256 tokenId = aCreatorNFT.mint("ipfs://test");
-        (uint256 nativeFee, ) = aCreatorNFT.getDeploymentFees(tokenId, bEid, paymentModuleImpl);
+        (uint256 nativeFee,) = aCreatorNFT.getDeploymentFees(tokenId, bEid, paymentModuleImpl);
         vm.prank(userA);
         aCreatorNFT.deployPaymentModule{value: nativeFee}(tokenId, bEid, paymentModuleImpl);
 
@@ -169,11 +163,7 @@ contract CreatorNFTTest is TestHelperOz5 {
             address(aCreatorNFT),
             tokenId
         );
-        Origin memory origin = Origin({
-            srcEid: aEid,
-            sender: AddressCast.toBytes32(address(aRegistry)),
-            nonce: 1
-        });
+        Origin memory origin = Origin({srcEid: aEid, sender: AddressCast.toBytes32(address(aRegistry)), nonce: 1});
         vm.prank(address(endpoints[bEid]));
         bRegistry.lzReceive(origin, bytes32(0), payload, address(0), "");
 
@@ -188,12 +178,13 @@ contract CreatorNFTTest is TestHelperOz5 {
         // Verify subscription
         assertTrue(PaymentModel(payable(paymentModule)).isSubscribed(userB), "User B should be subscribed");
 
-        (uint256 subTierId, uint256 startTime, uint256 endTime) = PaymentModel(payable(paymentModule)).getSubscriptionDetails(userB);
+        (uint256 subTierId, uint256 startTime, uint256 endTime) =
+            PaymentModel(payable(paymentModule)).getSubscriptionDetails(userB);
         assertEq(subTierId, 1, "Incorrect subscription tier ID");
         assertEq(endTime - startTime, 30 days, "Incorrect subscription duration");
     }
 
-    function onERC721Received(address,address,uint256,bytes calldata) external pure returns (bytes4) {
+    function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
         return this.onERC721Received.selector;
     }
 }

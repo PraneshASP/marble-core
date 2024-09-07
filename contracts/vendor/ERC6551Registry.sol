@@ -42,13 +42,10 @@ interface IERC6551Registry {
      *
      * @return account The address of the token bound account
      */
-    function account(
-        address implementation,
-        bytes32 salt,
-        uint256 chainId,
-        address tokenContract,
-        uint256 tokenId
-    ) external view returns (address account);
+    function account(address implementation, bytes32 salt, uint256 chainId, address tokenContract, uint256 tokenId)
+        external
+        view
+        returns (address account);
 }
 
 contract ERC6551Registry is IERC6551Registry {
@@ -128,13 +125,11 @@ contract ERC6551Registry is IERC6551Registry {
         }
     }
 
-    function account(
-        address implementation,
-        bytes32 salt,
-        uint256 chainId,
-        address tokenContract,
-        uint256 tokenId
-    ) external view returns (address) {
+    function account(address implementation, bytes32 salt, uint256 chainId, address tokenContract, uint256 tokenId)
+        external
+        view
+        returns (address)
+    {
         assembly {
             // Silence unused variable warnings
             pop(chainId)
