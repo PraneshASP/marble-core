@@ -1,108 +1,124 @@
-<p align="center">
-  <a href="https://layerzero.network">
-    <img alt="LayerZero" style="width: 400px" src="https://docs.layerzero.network/img/LayerZero_Logo_White.svg"/>
-  </a>
-</p>
 
-<p align="center">
-  <a href="https://layerzero.network" style="color: #a77dff">Homepage</a> | <a href="https://docs.layerzero.network/" style="color: #a77dff">Docs</a> | <a href="https://layerzero.network/developers" style="color: #a77dff">Developers</a>
-</p>
+# Marble - Omnichain Tokenbound Subscription Protocol
 
-<h1 align="center">OApp Example</h1>
+## Introduction
 
-<p align="center">
-  <a href="https://docs.layerzero.network/contracts/oapp" style="color: #a77dff">Quickstart</a> | <a href="https://docs.layerzero.network/contracts/oapp-configuration" style="color: #a77dff">Configuration</a> | <a href="https://docs.layerzero.network/contracts/options" style="color: #a77dff">Message Execution Options</a> | <a href="https://docs.layerzero.network/contracts/endpoint-addresses" style="color: #a77dff">Endpoint Addresses</a>
-</p>
+This project implements an omnichain subscription system controlled by NFTs, utilizing ERC6551 tokenbound accounts and LayerZero V2 for cross-chain communication. It allows creators to manage subscriptions across multiple blockchains from a single NFT on a base chain.
 
-<p align="center">Template project for getting started with LayerZero's  <code>OApp</code> contract development.</p>
+## Architecture Overview
 
-## 1) Developing Contracts
+```mermaid
+graph TB
+    subgraph "Base Chain"
+        A[CreatorNFT Contract]
+        B[Creator NFT]
+        F[LayerZero Endpoint]
+        A -->|Mints| B
+        A <-->|Uses| F
+    end
+    
+    subgraph "Chain A"
+        G[CustomRegistry A]
+        C[PaymentModule A]
+        G -->|Deploys| C
+    end
+    
+    subgraph "Chain B"
+        H[CustomRegistry B]
+        D[PaymentModule B]
+        H -->|Deploys| D
+    end
+    
+    subgraph "Chain C"
+        I[CustomRegistry C]
+        E[PaymentModule C]
+        I -->|Deploys| E
+    end
+    
+    B -->|Controls| C
+    B -->|Controls| D
+    B -->|Controls| E
+    
+    F <-->|_lzSend| G
+    F <-->|_lzSend| H
+    F <-->|_lzSend| I
+    
+    J[User] -->|Mints/Manages| A
+    J -->|Subscribes| C
+    J -->|Subscribes| D
+    J -->|Subscribes| E
+   ```
+    
+## Key Components
 
-#### Installing dependencies
+1. **CreatorNFT Contract**: 
+   - Deployed on the base chain
+   - Manages NFT minting and controls cross-chain operations
+   - Initiates deployment of PaymentModules on other chains
 
-We recommend using `pnpm` as a package manager (but you can of course use a package manager of your choice):
+2. **PaymentModule Contract**:
+   - Implements ERC6551 Account interface
+   - Manages subscriptions on its specific chain
+   - Can be deployed on multiple chains
 
-```bash
-pnpm install
+3. **CustomRegistry Contract**:
+   - Deployed on each chain
+   - Handles PaymentModule deployment and cross-chain message processing
+   - Inherits from ERC6551Registry for tokenbound account creation
+
+4. **LayerZero Integration**:
+   - Facilitates cross-chain communication
+   - Enables omnichain subscription management
+
+
+## Key Features
+
+1. **Single Point of Control**: CreatorNFT on the base chain controls all PaymentModules across different chains.
+2. **Unified Subscription Management**: Users manage subscriptions on any chain through the CreatorNFT contract.
+3. **Cross-Chain Subscription Validation**: Services can validate subscriptions on any chain via the CreatorNFT contract.
+4. **Flexible Deployment**: Creators can deploy PaymentModules to new chains as needed.
+
+## Subscription Tier Examples
+
+Users can subscribe to these different tiers using the `subscribe` function:
+
+- Monthly Subscription:
+
+```solidity
+createTier(1 ether, 30 days);
 ```
 
-#### Compiling your contracts
+This creates a tier with a price of 1 ETH and a duration of 30 days.
 
-This project supports both `hardhat` and `forge` compilation. By default, the `compile` command will execute both:
+- Quarterly Subscription:
 
-```bash
-pnpm compile
+```solidity
+createTier(2.5 ether, 90 days);
 ```
 
-If you prefer one over the other, you can use the tooling-specific commands:
 
-```bash
-pnpm compile:forge
-pnpm compile:hardhat
+
+- Annual Subscription:
+
+```solidity
+createTier(7.5 ether, 365 days);
 ```
 
-Or adjust the `package.json` to for example remove `forge` build:
 
-```diff
-- "compile": "$npm_execpath run compile:forge && $npm_execpath run compile:hardhat",
-- "compile:forge": "forge build",
-- "compile:hardhat": "hardhat compile",
-+ "compile": "hardhat compile"
+
+- Lifetime Subscription:
+
+```solidity
+createTier(12.5 ether, 36500 days);
 ```
 
-#### Running tests
+This creates a tier with a price of 12.5 ETH and a duration of 100 years (effectively lifetime).
 
-Similarly to the contract compilation, we support both `hardhat` and `forge` tests. By default, the `test` command will execute both:
+## Future Improvement Ideas
 
-```bash
-pnpm test
-```
+1. **Multi-Token Support**: Enable subscriptions to be purchased with various ERC20 tokens across different chains with price oracle integration.
 
-If you prefer one over the other, you can use the tooling-specific commands:
+2. **Subscription Streaming**: Integrate with protocols like Sablier to enable real-time streaming of subscription payments.
 
-```bash
-pnpm test:forge
-pnpm test:hardhat
-```
+3. **Automated Subscription Management**: Integrate Chainlink Keepers or Gelato for automated subscription renewals and cancellations.
 
-Or adjust the `package.json` to for example remove `hardhat` tests:
-
-```diff
-- "test": "$npm_execpath test:forge && $npm_execpath test:hardhat",
-- "test:forge": "forge test",
-- "test:hardhat": "$npm_execpath hardhat test"
-+ "test": "forge test"
-```
-
-## 2) Deploying Contracts
-
-Set up deployer wallet/account:
-
-- Rename `.env.example` -> `.env`
-- Choose your preferred means of setting up your deployer wallet/account:
-
-```
-MNEMONIC="test test test test test test test test test test test junk"
-or...
-PRIVATE_KEY="0xabc...def"
-```
-
-To deploy your contracts to your desired blockchains, run the following command in your project's folder:
-
-```bash
-npx hardhat lz:deploy
-```
-
-More information about available CLI arguments can be found using the `--help` flag:
-
-```bash
-npx hardhat lz:deploy --help
-```
-
-By following these steps, you can focus more on creating innovative omnichain solutions and less on the complexities of cross-chain communication.
-
-<br></br>
-
-<p align="center">
-  Join our community on <a href="https://discord-layerzero.netlify.app/discord" style="color: #a77dff">Discord</a> | Follow us on <a href="https://twitter.com/LayerZero_Labs" style="color: #a77dff">Twitter</a>
-</p>
