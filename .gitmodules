@@ -1,0 +1,3 @@
+[submodule "marble-frontend"]
+	path = marble-frontend
+	url = https://github.com/loungcs/marble-frontend.git
